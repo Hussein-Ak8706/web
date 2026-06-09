@@ -82,7 +82,7 @@ PHOTO_URLS = None   # set to a list of 6 URLs to use Drive instead of local file
 # 1. Upload your .mp4 to Google Drive
 # 2. Right-click → Share → "Anyone with the link can view" → Copy link
 # 3. Paste that link below
-GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/YOUR_FILE_ID_HERE/view?usp=sharing"
+GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1QD3ng198KXxSXWjBAEt_9ytau2C5-Qb7/view?usp=drive_link"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # INTERNALS
@@ -128,9 +128,8 @@ def photo_src(idx: int) -> str:
 def photo_tag(idx: int, height="200px") -> str:
     src = photo_src(idx)
     if src:
-        return (f'<img src="{src}" style="width:100%;height:{height};'
-                f'object-fit:cover;object-position:center;display:block;'
-                f'margin:8px 0;border:1px solid {ACCENT};" />')
+        return (f'<img src="{src}" style="width:100%;height:auto;'
+                f'display:block;margin:8px 0;border:1px solid {ACCENT};" />')
     return (f'<div style="width:100%;height:{height};background:{ACCENT};'
             f'display:flex;align-items:center;justify-content:center;'
             f'margin:8px 0;color:{INK_LIGHT};font-style:italic;font-size:0.75rem;">'
