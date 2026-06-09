@@ -40,7 +40,7 @@ ALWAYS_YOURS_ITEMS = [
 ]
 
 # ── COLORS ───────────────────────────────────────────────────────────────────
-PAGE_BG   = "#2d1f3d"   # deep purple backdrop
+PAGE_BG   = "#ba99c5"   # deep purple backdrop
 PAPER_BG  = "#f7f2fa"   # light plum-tinted paper
 INK       = "#3b1f4e"   # dark plum ink
 INK_LIGHT = "#6b4a82"   # medium purple for body text
@@ -328,10 +328,11 @@ html = f"""<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- top: two photos side by side -->
-  <div class="photo-row">
-    {photo_tag(0)}
-    {photo_tag(1)}
+  <!-- top: two photos at fixed equal height -->
+  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-bottom:1.5px solid {INK};">
+    <div style="overflow:hidden;height:300px;"><img src="{photo_src(0)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
+    <div style="background:{INK};"></div>
+    <div style="overflow:hidden;height:300px;"><img src="{photo_src(1)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
   </div>
 
   <!-- bottom: two text columns -->
@@ -360,17 +361,18 @@ html = f"""<!DOCTYPE html>
 
   <div class="story-head">The Story of Us</div>
 
-  <!-- top: two photos -->
-  <div class="photo-row">
-    {photo_tag(2)}
-    {photo_tag(3)}
+  <!-- top: two photos at fixed equal height -->
+  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-bottom:1.5px solid {INK};">
+    <div style="overflow:hidden;height:320px;"><img src="{photo_src(2)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
+    <div style="background:{INK};"></div>
+    <div style="overflow:hidden;height:320px;"><img src="{photo_src(3)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
   </div>
 
   <!-- three photos in equal columns -->
   <div style="display:grid;grid-template-columns:1fr 1.5px 1fr 1.5px 1fr;border-top:1.5px solid {INK};">
-    <div>{photo_tag(4)}</div>
+    <div style="overflow:hidden;height:280px;"><img src="{photo_src(4)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
     <div style="background:{INK};"></div>
-    <div>{photo_tag(5)}</div>
+    <div style="overflow:hidden;height:280px;"><img src="{photo_src(5)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
     <div style="background:{INK};"></div>
     <div class="always-yours" style="border-top:none;">
       <div class="always-head">Always Yours</div>
