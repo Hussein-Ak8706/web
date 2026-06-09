@@ -1,447 +1,316 @@
 import streamlit as st
-import os
 import re
+import base64
 from pathlib import Path
 
-# ── Page config ──────────────────────────────────────────────────────────────
-st.set_page_config(
-    page_title="The Love Gazette",
-    layout="wide",
-    initial_sidebar_state="collapsed",
+# ══════════════════════════════════════════════════════════════════════════════
+# CONFIG — edit everything here
+# ══════════════════════════════════════════════════════════════════════════════
+
+PARTNER_NAMES    = "Name Surname & Name Surname"
+ANNIVERSARY_TEXT = "One Year Of"
+SUBTITLE         = "Endless Love"
+DATE_LINE        = "SUNDAY, 26 APRIL 2025"
+CITY_LINE        = "CITY, STREET, COUNTRY"
+VOL_LINE         = "VOL. 1"
+
+OUR_STORY_HEADLINE = "OUR DEAREST"
+OUR_STORY_SUBHEAD  = "Journey"
+OUR_STORY_BODY     = (
+    "From the very first moment we met, something shifted — quietly, almost without notice, "
+    "the way morning light changes a room. This year has been filled with shared coffee cups, "
+    "long walks, unexpected laughter, and the kind of warmth that stays. "
+    "Every adventure we have taken together has written itself into who we are. "
+    "The moments big and small, all of it — ours."
 )
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
-BASE_DIR   = Path(__file__).resolve().parent.parent   # Base/
-MEDIA_DIR  = BASE_DIR / "Media"
+LOVE_ALL_HEADLINE = "LOVE ALL"
+LOVE_ALL_SUBHEAD  = "Around"
+LOVE_ALL_BODY     = (
+    "Love isn't one grand gesture. It lives in the details: a note left on the counter, "
+    "a song played for no reason, a hand found in the dark. "
+    "We've collected these moments like pressed flowers — fragile, beautiful, kept."
+)
 
-PHOTO_PATHS = sorted(MEDIA_DIR.glob("photo_*.jpg")) + sorted(MEDIA_DIR.glob("photo_*.png"))
+BEST_PART_HEADLINE = "THE BEST PART OF OUR STORY"
+BEST_PART_BODY     = (
+    "There is no ending here — only the next chapter, and the one after that. "
+    "The best part? We write it together."
+)
+
+ALWAYS_YOURS_ITEMS = [
+    "Every morning with you",
+    "Every laugh we've shared",
+    "Every mile we've walked",
+    "Every dream we've built",
+    "Every moment still ahead",
+]
+
+# ── COLORS — change these to restyle the whole site ──────────────────────────
+#
+#   PAGE_BG      : outer page background
+#   PAPER_BG     : newspaper paper color
+#   INK          : main text / borders
+#   INK_LIGHT    : secondary text (meta, captions)
+#   ACCENT       : subtle tint (placeholders, sidebar bg)
+#
+PAGE_BG   = "#f5f0e8"   # warm off-white backdrop
+PAPER_BG  = "#faf6ee"   # slightly warmer newsprint
+INK       = "#1a1a1a"   # near-black ink
+INK_LIGHT = "#555555"   # lighter ink for meta text
+ACCENT    = "#e8e2d8"   # tinted areas
 
 # ── Google Drive video ────────────────────────────────────────────────────────
-# Paste your Google Drive share link here.
-# Make sure the file is shared as "Anyone with the link can view".
-# Supported formats:
-#   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-#   https://drive.google.com/open?id=FILE_ID
-GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1QD3ng198KXxSXWjBAEt_9ytau2C5-Qb7/view?usp=drive_link"
+# 1. Upload your .mp4 to Google Drive
+# 2. Right-click → Share → "Anyone with the link can view" → Copy link
+# 3. Paste it below
+GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/YOUR_FILE_ID_HERE/view?usp=sharing"
 
-def gdrive_embed_url(share_url: str) -> str | None:
-    """Convert a Google Drive share link to a direct embed URL."""
-    match = re.search(r"/d/([a-zA-Z0-9_-]+)", share_url)
-    if not match:
-        match = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", share_url)
-    if match:
-        file_id = match.group(1)
-        return f"https://drive.google.com/file/d/{file_id}/preview"
-    return None
+# ══════════════════════════════════════════════════════════════════════════════
+# INTERNALS — no need to edit below this line
+# ══════════════════════════════════════════════════════════════════════════════
 
-# ── Config (edit these) ───────────────────────────────────────────────────────
-PARTNER_NAMES   = "Hussein & Abhineet"
-ANNIVERSARY_TEXT = "One Year"
-SUBTITLE         = ""
-DATE_LINE        = "26 APRIL 2025"
-CITY_LINE        = ""
-VOL_LINE         = ""
+st.set_page_config(page_title="The Love Gazette", layout="wide",
+                   initial_sidebar_state="collapsed")
 
-OUR_STORY_HEADLINE = ""
-OUR_STORY_SUBHEAD  = ""
-OUR_STORY_BODY     = """
+BASE_DIR  = Path(__file__).resolve().parent.parent
+MEDIA_DIR = BASE_DIR / "Media"
+PHOTO_PATHS = (
+    sorted(MEDIA_DIR.glob("photo_*.jpg")) +
+    sorted(MEDIA_DIR.glob("photo_*.png"))
+)
 
-"""
+def gdrive_embed_url(url: str):
+    m = re.search(r"/d/([a-zA-Z0-9_-]+)", url)
+    if not m:
+        m = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url)
+    return f"https://drive.google.com/file/d/{m.group(1)}/preview" if m else None
 
-LOVE_ALL_HEADLINE  = "LOVE YOU"
-LOVE_ALL_SUBHEAD   = ""
-LOVE_ALL_BODY      = """
-"""
+def img_b64(path: Path) -> str:
+    ext = path.suffix.lower().lstrip(".")
+    mime = "jpeg" if ext in ("jpg", "jpeg") else "png"
+    data = base64.b64encode(path.read_bytes()).decode()
+    return f"data:image/{mime};base64,{data}"
 
-BEST_PART_HEADLINE = ""
-BEST_PART_BODY     = """
-"""
-
-ALWAYS_YOURS_TEXT = "ALWAYS YOURS"
-ALWAYS_YOURS_BODY = """
-• Every morning with you\n• Every laugh we've shared\n• Every lap we've taken around campus\n• Every moment still ahead
-"""
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
-def photo_placeholder(label="Photo"):
-    """Returns an SVG placeholder string."""
-    return f"""
-    <div class="photo-placeholder">
-        <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-            <rect width="80" height="60" fill="#f0ece4" rx="2"/>
-            <polyline points="0,60 25,30 45,45 60,25 80,50 80,60" fill="#d8d0c4" stroke="none"/>
-            <circle cx="22" cy="18" r="7" fill="#c8bfb0"/>
-            <text x="40" y="55" text-anchor="middle" font-size="6" fill="#999">{label}</text>
-        </svg>
-    </div>
-    """
-
-def render_photo(idx, width="100%"):
-    """Render a real photo if available, otherwise a placeholder."""
+def photo_html(idx: int, height="180px") -> str:
     if idx < len(PHOTO_PATHS):
-        return f'<img src="{PHOTO_PATHS[idx].as_uri()}" style="width:{width};object-fit:cover;" />'
-    return photo_placeholder(f"Photo {idx+1}")
+        src = img_b64(PHOTO_PATHS[idx])
+        return (f'<img src="{src}" style="width:100%;height:{height};'
+                f'object-fit:cover;display:block;margin:8px 0;" />')
+    # SVG placeholder
+    return f"""
+    <div style="background:{ACCENT};height:{height};display:flex;align-items:center;
+         justify-content:center;margin:8px 0;color:{INK_LIGHT};
+         font-family:Georgia,serif;font-style:italic;font-size:0.7rem;">
+      Photo {idx+1}
+    </div>"""
 
-def render_video():
-    embed_url = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)
-    if embed_url and "YOUR_FILE_ID_HERE" not in GOOGLE_DRIVE_VIDEO_URL:
-        st.markdown(f"""
-        <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; background:#111;">
-            <iframe
-                src="{embed_url}"
-                style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;"
-                allowfullscreen
-                allow="autoplay"
-            ></iframe>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <div style="background:#1a1a1a; color:#888; text-align:center;
-             padding:60px 20px; font-family:Georgia,serif; font-style:italic; font-size:0.85rem;">
-            Paste your Google Drive share link into<br>
-            <code style="color:#aaa;">GOOGLE_DRIVE_VIDEO_URL</code> in app.py
-        </div>
-        """, unsafe_allow_html=True)
+def video_html() -> str:
+    embed = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)
+    if embed and "YOUR_FILE_ID_HERE" not in GOOGLE_DRIVE_VIDEO_URL:
+        return f"""
+        <div style="width:100%;max-width:480px;margin:0 auto;">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;
+               background:#111;border:1px solid {INK};">
+            <iframe src="{embed}"
+              style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+              allowfullscreen allow="autoplay"></iframe>
+          </div>
+        </div>"""
+    return f"""
+        <div style="width:100%;max-width:480px;margin:0 auto;background:#1a1a1a;
+             padding:48px 16px;text-align:center;color:#888;
+             font-family:Georgia,serif;font-style:italic;font-size:0.8rem;
+             border:1px solid {INK};">
+          Paste your Google Drive link into<br>
+          <code style="color:#aaa;font-size:0.75rem;">GOOGLE_DRIVE_VIDEO_URL</code>
+          in app.py
+        </div>"""
 
-# ── CSS ───────────────────────────────────────────────────────────────────────
-st.markdown("""
+def always_yours_items() -> str:
+    rows = "".join(
+        f'<div style="padding:3px 0;border-bottom:0.5px solid {ACCENT};">'
+        f'&#8226; {item}</div>'
+        for item in ALWAYS_YOURS_ITEMS
+    )
+    return rows
+
+# ── Shared CSS injected once ──────────────────────────────────────────────────
+st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
-/* ── Reset Streamlit chrome ── */
-[data-testid="stAppViewContainer"] { background: #f5f0e8; }
-[data-testid="stHeader"] { display: none; }
-.block-container { padding: 0 !important; max-width: 100% !important; }
-footer { display: none; }
-[data-testid="stVerticalBlock"] > div { gap: 0 !important; }
-
-/* ── Newspaper shell ── */
-.gazette-wrapper {
-    max-width: 960px;
-    margin: 32px auto 60px auto;
-    background: #faf6ee;
-    border: 1.5px solid #1a1a1a;
-    font-family: 'Libre Baskerville', Georgia, serif;
-    color: #1a1a1a;
-}
-
-/* ── Masthead ── */
-.masthead {
-    border-bottom: 2.5px solid #1a1a1a;
-    padding: 10px 16px 6px;
-    text-align: center;
-}
-.masthead-title {
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: clamp(2rem, 6vw, 3.6rem);
-    letter-spacing: 0.04em;
-    line-height: 1;
-    color: #1a1a1a;
-}
-.masthead-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.55rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #444;
-    padding: 4px 0 2px;
-    border-top: 0.75px solid #1a1a1a;
-    border-bottom: 0.75px solid #1a1a1a;
-    margin-top: 4px;
-}
-
-/* ── Hero headline ── */
-.hero-headline-block {
-    text-align: center;
-    padding: 18px 24px 8px;
-    border-bottom: 1px solid #1a1a1a;
-}
-.hero-kicker {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(0.9rem, 3vw, 1.5rem);
-    font-weight: 700;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    margin-bottom: 2px;
-}
-.hero-headline {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.2rem, 7vw, 5rem);
-    font-weight: 900;
-    line-height: 1.0;
-    letter-spacing: -0.01em;
-}
-.hero-subtitle {
-    font-family: 'IM Fell English', Georgia, serif;
-    font-style: italic;
-    font-size: clamp(1rem, 3vw, 1.6rem);
-    margin-top: 2px;
-    color: #333;
-}
-
-/* ── Front page body ── */
-.front-body {
-    display: grid;
-    grid-template-columns: 1fr;
-    padding: 16px;
-    gap: 12px;
-    border-bottom: 2px solid #1a1a1a;
-}
-.video-frame {
-    border: 1px solid #bbb;
-    background: #111;
-    min-height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.byline {
-    text-align: center;
-    font-family: 'IM Fell English', Georgia, serif;
-    font-style: italic;
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    letter-spacing: 0.06em;
-    padding: 8px 0 4px;
-    border-top: 0.75px solid #1a1a1a;
-}
-
-/* ── Hairline dividers ── */
-.h-rule { border: none; border-top: 1px solid #1a1a1a; margin: 0; }
-.h-rule-thick { border: none; border-top: 2px solid #1a1a1a; margin: 0; }
-
-/* ── Inside spread ── */
-.spread {
-    display: grid;
-    grid-template-columns: 1fr 2px 1fr;
-    gap: 0;
-    border-bottom: 2px solid #1a1a1a;
-}
-.spread-col {
-    padding: 14px;
-}
-.spread-divider { background: #1a1a1a; }
-
-/* ── Story page ── */
-.story-spread {
-    display: grid;
-    grid-template-columns: 1fr 2px 1fr;
-    gap: 0;
-}
-.story-col { padding: 14px; }
-
-/* ── Section headline ── */
-.sec-head {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(0.9rem, 2.5vw, 1.3rem);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border-bottom: 1px solid #1a1a1a;
-    margin-bottom: 6px;
-    padding-bottom: 3px;
-}
-.sec-subhead {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
-    margin-bottom: 6px;
-    color: #222;
-}
-.body-text {
-    font-size: 0.72rem;
-    line-height: 1.65;
-    color: #222;
-    text-align: justify;
-    hyphens: auto;
-}
-.photo-placeholder {
-    background: #e8e2d8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 8px 0;
-}
-.photo-placeholder svg { width: 100%; height: auto; display: block; }
-
-/* ── Always Yours sidebar ── */
-.sidebar-box {
-    border: 1px solid #1a1a1a;
-    padding: 10px;
-    margin-top: 10px;
-}
-.sidebar-box-head {
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-align: center;
-    border-bottom: 1px solid #1a1a1a;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-}
-.sidebar-box-body {
-    font-size: 0.65rem;
-    line-height: 2;
-    color: #333;
-    text-align: center;
-}
-
-/* ── Partner page ── */
-.partner-page {
-    display: grid;
-    grid-template-columns: 1fr 2px 1fr;
-}
-.partner-col { padding: 14px; text-align: center; }
-.partner-name {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: clamp(0.9rem, 2vw, 1.15rem);
-    margin-top: 8px;
-    color: #333;
-}
+[data-testid="stAppViewContainer"] {{ background:{PAGE_BG}; }}
+[data-testid="stHeader"] {{ display:none; }}
+.block-container {{ padding:0 !important; max-width:100% !important; }}
+footer {{ display:none; }}
+[data-testid="stVerticalBlock"] > div {{ gap:0 !important; }}
 </style>
 """, unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PAGE 1  –  FRONT COVER
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown(f"""
-<div class="gazette-wrapper">
+# ── Helpers for consistent component HTML strings ─────────────────────────────
+def masthead(small=False) -> str:
+    size = "1.55rem" if small else "clamp(2rem,6vw,3.4rem)"
+    return f"""
+    <div style="border-bottom:2.5px solid {INK};padding:10px 18px 6px;text-align:center;
+         background:{PAPER_BG};">
+      <div style="font-family:'UnifrakturMaguntia',cursive;font-size:{size};
+           letter-spacing:0.04em;line-height:1;color:{INK};">The Love Gazette</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.52rem;
+           letter-spacing:0.12em;text-transform:uppercase;color:{INK_LIGHT};
+           padding:4px 0 2px;border-top:0.75px solid {INK};
+           border-bottom:0.75px solid {INK};margin-top:5px;">
+        <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
+      </div>
+    </div>"""
 
-  <!-- MASTHEAD -->
-  <div class="masthead">
-    <div class="masthead-title">The Love Gazette</div>
-    <div class="masthead-meta">
-      <span>{VOL_LINE}</span>
-      <span>{DATE_LINE}</span>
-      <span>{CITY_LINE}</span>
-    </div>
-  </div>
+def wrapper(inner: str) -> str:
+    return f"""
+    <div style="max-width:900px;margin:28px auto 0 auto;
+         background:{PAPER_BG};border:1.5px solid {INK};
+         font-family:'Libre Baskerville',Georgia,serif;color:{INK};">
+      {inner}
+    </div>"""
 
-  <!-- HERO HEADLINE -->
-  <div class="hero-headline-block">
-    <div class="hero-kicker">{ANNIVERSARY_TEXT}</div>
-    <div class="hero-headline">{ANNIVERSARY_TEXT.upper()}</div>
-    <div class="hero-subtitle">{SUBTITLE}</div>
-  </div>
+def sec_head(text: str) -> str:
+    return f"""
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(0.85rem,2vw,1.1rem);
+         font-weight:900;text-transform:uppercase;letter-spacing:0.08em;
+         border-bottom:1px solid {INK};margin-bottom:6px;padding-bottom:3px;">
+      {text}
+    </div>"""
 
-  <!-- VIDEO SLOT -->
-  <div class="front-body">
-""", unsafe_allow_html=True)
+def sec_subhead(text: str) -> str:
+    return f"""
+    <div style="font-family:'IM Fell English',serif;font-style:italic;
+         font-size:clamp(0.95rem,2vw,1.25rem);margin-bottom:6px;color:{INK};">
+      {text}
+    </div>"""
 
-# Streamlit-native video (must be outside raw HTML)
-render_video()
-
-st.markdown(f"""
-    <div class="byline">{PARTNER_NAMES}</div>
-  </div>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PAGE 2  –  INSIDE SPREAD (small photos + story columns)
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown(f"""
-<div class="gazette-wrapper">
-
-  <!-- MASTHEAD (condensed) -->
-  <div class="masthead">
-    <div class="masthead-title" style="font-size:1.6rem;">The Love Gazette</div>
-    <div class="masthead-meta">
-      <span>{VOL_LINE}</span>
-      <span>{DATE_LINE}</span>
-      <span>{CITY_LINE}</span>
-    </div>
-  </div>
-
-  <!-- MINI HEADLINE STRIP -->
-  <div style="text-align:center; padding:10px 16px; border-bottom:1px solid #1a1a1a;">
-    <div class="hero-kicker" style="font-size:0.75rem;">{ANNIVERSARY_TEXT}</div>
-    <div class="hero-headline" style="font-size:2.4rem;">{ANNIVERSARY_TEXT.upper()}</div>
-    <div class="hero-subtitle" style="font-size:1rem;">{SUBTITLE}</div>
-  </div>
-
-  <div class="spread">
-    <!-- LEFT COLUMN -->
-    <div class="spread-col">
-      <div class="sec-head">{OUR_STORY_HEADLINE}</div>
-      <div class="sec-subhead">{OUR_STORY_SUBHEAD}</div>
-      {render_photo(0)}
-      <p class="body-text">{OUR_STORY_BODY.strip()}</p>
-      {render_photo(1)}
-    </div>
-
-    <div class="spread-divider"></div>
-
-    <!-- RIGHT COLUMN -->
-    <div class="spread-col">
-      <div class="sec-head">{LOVE_ALL_HEADLINE}</div>
-      <div class="sec-subhead">{LOVE_ALL_SUBHEAD}</div>
-      {render_photo(2)}
-      <p class="body-text">{LOVE_ALL_BODY.strip()}</p>
-      <div class="byline" style="font-size:0.85rem;">{PARTNER_NAMES}</div>
-    </div>
-  </div>
-
-</div>
-""", unsafe_allow_html=True)
+def body_p(text: str) -> str:
+    return f"""
+    <p style="font-size:0.72rem;line-height:1.7;color:{INK_LIGHT};
+       text-align:justify;hyphens:auto;margin:6px 0;">{text}</p>"""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PAGE 3  –  THE STORY OF US
+# PAGE 1 — FRONT COVER
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown(f"""
-<div class="gazette-wrapper">
+p1 = wrapper(f"""
+  {masthead()}
 
-  <!-- STORY HEADLINE -->
-  <div class="masthead">
-    <div class="masthead-title" style="font-size:1.6rem;">The Love Gazette</div>
-    <div class="masthead-meta">
-      <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
-    </div>
+  <div style="text-align:center;padding:18px 24px 10px;
+       border-bottom:1.5px solid {INK};background:{PAPER_BG};">
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(0.8rem,2.5vw,1.2rem);
+         font-weight:700;letter-spacing:0.35em;text-transform:uppercase;">{ANNIVERSARY_TEXT}</div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(2rem,7vw,4.6rem);
+         font-weight:900;line-height:1;letter-spacing:-0.01em;">{ANNIVERSARY_TEXT.upper()}</div>
+    <div style="font-family:'IM Fell English',serif;font-style:italic;
+         font-size:clamp(1rem,3vw,1.5rem);color:{INK_LIGHT};margin-top:2px;">{SUBTITLE}</div>
   </div>
 
-  <div style="text-align:center; padding:14px 24px 10px; border-bottom:2px solid #1a1a1a;">
-    <div class="hero-headline" style="font-size:2.8rem;">THE STORY OF US</div>
+  <div style="padding:18px 24px;border-bottom:2px solid {INK};background:{PAPER_BG};">
+    {video_html()}
   </div>
 
-  <div class="story-spread">
+  <div style="text-align:center;font-family:'IM Fell English',serif;font-style:italic;
+       font-size:clamp(0.9rem,2vw,1.2rem);letter-spacing:0.06em;
+       padding:10px 0 12px;border-top:0.75px solid {INK};background:{PAPER_BG};">
+    {PARTNER_NAMES}
+  </div>
+""")
+st.markdown(p1, unsafe_allow_html=True)
 
-    <!-- LEFT -->
-    <div class="story-col">
-      <div class="sec-head">OUR BEST CHAPTER</div>
-      {render_photo(3)}
-      <p class="body-text">{OUR_STORY_BODY.strip()}</p>
-      {render_photo(4)}
-      <p class="body-text">{LOVE_ALL_BODY.strip()}</p>
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE 2 — INSIDE SPREAD
+# ══════════════════════════════════════════════════════════════════════════════
+p2 = wrapper(f"""
+  {masthead(small=True)}
+
+  <div style="text-align:center;padding:10px 16px 8px;border-bottom:1px solid {INK};">
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(0.7rem,2vw,0.9rem);
+         font-weight:700;letter-spacing:0.3em;text-transform:uppercase;">{ANNIVERSARY_TEXT}</div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,2.8rem);
+         font-weight:900;line-height:1.05;">{ANNIVERSARY_TEXT.upper()}</div>
+    <div style="font-family:'IM Fell English',serif;font-style:italic;
+         font-size:clamp(0.9rem,2vw,1.1rem);color:{INK_LIGHT};">{SUBTITLE}</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 2px 1fr;border-bottom:2px solid {INK};">
+
+    <div style="padding:14px;">
+      {sec_head(OUR_STORY_HEADLINE)}
+      {sec_subhead(OUR_STORY_SUBHEAD)}
+      {photo_html(0)}
+      {body_p(OUR_STORY_BODY)}
+      {photo_html(1)}
     </div>
 
-    <div class="spread-divider"></div>
+    <div style="background:{INK};"></div>
 
-    <!-- RIGHT -->
-    <div class="story-col">
-      <div class="sec-head">{BEST_PART_HEADLINE}</div>
-      {render_photo(5)}
-      <p class="body-text">{BEST_PART_BODY.strip()}</p>
-
-      <div class="sidebar-box">
-        <div class="sidebar-box-head">{ALWAYS_YOURS_TEXT}</div>
-        <div class="sidebar-box-body">{ALWAYS_YOURS_BODY.strip()}</div>
+    <div style="padding:14px;">
+      {sec_head(LOVE_ALL_HEADLINE)}
+      {sec_subhead(LOVE_ALL_SUBHEAD)}
+      {photo_html(2)}
+      {body_p(LOVE_ALL_BODY)}
+      <div style="text-align:center;font-family:'IM Fell English',serif;font-style:italic;
+           font-size:0.85rem;padding:8px 0 2px;border-top:0.75px solid {INK};margin-top:10px;">
+        {PARTNER_NAMES}
       </div>
     </div>
 
   </div>
+""")
+st.markdown(p2, unsafe_allow_html=True)
 
-</div>
-""", unsafe_allow_html=True)
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE 3 — THE STORY OF US
+# ══════════════════════════════════════════════════════════════════════════════
+p3 = wrapper(f"""
+  {masthead(small=True)}
+
+  <div style="text-align:center;padding:14px 24px 10px;border-bottom:2px solid {INK};">
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3rem);
+         font-weight:900;line-height:1;">THE STORY OF US</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 2px 1fr;">
+
+    <div style="padding:14px;">
+      {sec_head("OUR BEST CHAPTER")}
+      {photo_html(3)}
+      {body_p(OUR_STORY_BODY)}
+      {photo_html(4)}
+      {body_p(LOVE_ALL_BODY)}
+    </div>
+
+    <div style="background:{INK};"></div>
+
+    <div style="padding:14px;">
+      {sec_head(BEST_PART_HEADLINE)}
+      {photo_html(5)}
+      {body_p(BEST_PART_BODY)}
+
+      <div style="border:1px solid {INK};padding:10px;margin-top:14px;background:{PAPER_BG};">
+        <div style="font-family:'Playfair Display',serif;font-weight:900;font-size:0.72rem;
+             text-transform:uppercase;letter-spacing:0.1em;text-align:center;
+             border-bottom:1px solid {INK};margin-bottom:6px;padding-bottom:4px;">
+          ALWAYS YOURS
+        </div>
+        <div style="font-size:0.65rem;line-height:2;color:{INK_LIGHT};text-align:center;">
+          {always_yours_items()}
+        </div>
+      </div>
+    </div>
+
+  </div>
+""")
+st.markdown(p3, unsafe_allow_html=True)
 
 # ── Footer ────────────────────────────────────────────────────────────────────
-st.markdown("""
-<div style="text-align:center; color:#888; font-size:0.6rem;
-     letter-spacing:0.15em; text-transform:uppercase; padding:24px 0 40px;">
+st.markdown(f"""
+<div style="max-width:900px;margin:0 auto 48px auto;text-align:center;
+     color:{INK_LIGHT};font-size:0.55rem;letter-spacing:0.15em;
+     text-transform:uppercase;padding:14px 0;">
   The Love Gazette &nbsp;·&nbsp; Printed with Love
 </div>
 """, unsafe_allow_html=True)
