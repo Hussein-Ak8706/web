@@ -366,14 +366,11 @@ html = f"""<!DOCTYPE html>
     {photo_tag(3)}
   </div>
 
-  <!-- bottom: two more photos + always yours -->
-  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-top:1px solid {INK};">
-    <div style="padding:0;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:0;">
-        <div style="border-right:0.75px solid {INK};">{photo_tag(4)}</div>
-        <div>{photo_tag(5)}</div>
-      </div>
-    </div>
+  <!-- three photos in equal columns -->
+  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr 1.5px 1fr;border-top:1.5px solid {INK};">
+    <div>{photo_tag(4)}</div>
+    <div style="background:{INK};"></div>
+    <div>{photo_tag(5)}</div>
     <div style="background:{INK};"></div>
     <div class="always-yours" style="border-top:none;">
       <div class="always-head">Always Yours</div>
