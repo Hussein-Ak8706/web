@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-import base64
+import re
 from pathlib import Path
 
 # ── Page config ──────────────────────────────────────────────────────────────
@@ -13,10 +13,26 @@ st.set_page_config(
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR   = Path(__file__).resolve().parent.parent   # Base/
 MEDIA_DIR  = BASE_DIR / "Media"
-SCRIPT_DIR = BASE_DIR / "Scripts"
 
-VIDEO_PATH  = MEDIA_DIR / "main_video.mp4"
 PHOTO_PATHS = sorted(MEDIA_DIR.glob("photo_*.jpg")) + sorted(MEDIA_DIR.glob("photo_*.png"))
+
+# ── Google Drive video ────────────────────────────────────────────────────────
+# Paste your Google Drive share link here.
+# Make sure the file is shared as "Anyone with the link can view".
+# Supported formats:
+#   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+#   https://drive.google.com/open?id=FILE_ID
+GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/YOUR_FILE_ID_HERE/view?usp=sharing"
+
+def gdrive_embed_url(share_url: str) -> str | None:
+    """Convert a Google Drive share link to a direct embed URL."""
+    match = re.search(r"/d/([a-zA-Z0-9_-]+)", share_url)
+    if not match:
+        match = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", share_url)
+    if match:
+        file_id = match.group(1)
+        return f"https://drive.google.com/file/d/{file_id}/preview"
+    return None
 
 # ── Config (edit these) ───────────────────────────────────────────────────────
 PARTNER_NAMES   = "Name Surname & Name Surname"
@@ -77,10 +93,26 @@ def render_photo(idx, width="100%"):
     return photo_placeholder(f"Photo {idx+1}")
 
 def render_video():
-    if VIDEO_PATH.exists():
-        st.video(str(VIDEO_PATH))
+    embed_url = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)
+    if embed_url and "YOUR_FILE_ID_HERE" not in GOOGLE_DRIVE_VIDEO_URL:
+        st.markdown(f"""
+        <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; background:#111;">
+            <iframe
+                src="{embed_url}"
+                style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;"
+                allowfullscreen
+                allow="autoplay"
+            ></iframe>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        st.markdown(photo_placeholder("Main Video (upload main_video.mp4)"), unsafe_allow_html=True)
+        st.markdown("""
+        <div style="background:#1a1a1a; color:#888; text-align:center;
+             padding:60px 20px; font-family:Georgia,serif; font-style:italic; font-size:0.85rem;">
+            Paste your Google Drive share link into<br>
+            <code style="color:#aaa;">GOOGLE_DRIVE_VIDEO_URL</code> in app.py
+        </div>
+        """, unsafe_allow_html=True)
 
 # ── CSS ───────────────────────────────────────────────────────────────────────
 st.markdown("""
