@@ -9,7 +9,7 @@ from pathlib import Path
 
 PARTNER_NAMES    = "Hussein & Abhineet"
 ANNIVERSARY_TEXT = "One Year"
-SUBTITLE         = "Endless Love"
+SUBTITLE         = ""
 DATE_LINE        = "SATURDAY, 26 APRIL 2025"
 CITY_LINE        = "Mohali, Plaksha"
 VOL_LINE         = "VOL. 1"
@@ -55,11 +55,11 @@ ALWAYS_YOURS_ITEMS = [
 #   INK_LIGHT : body copy, captions, meta text
 #   ACCENT    : placeholder boxes, subtle tints
 #
-PAGE_BG   = "#1e1520"
-PAPER_BG  = "#261a2e"
-INK       = "#e8d5f5"
-INK_LIGHT = "#c4a8e0"
-ACCENT    = "#3d2b4f"
+PAGE_BG   = "#ede4f0"
+PAPER_BG  = "#f7f2fa"
+INK       = "#3b1f4e"
+INK_LIGHT = "#6b4a82"
+ACCENT    = "#ddd0eb"
 
 # ── PHOTOS ────────────────────────────────────────────────────────────────────
 # Option A (default): local files in Base/Media/
