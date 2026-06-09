@@ -22,7 +22,7 @@ PHOTO_PATHS = sorted(MEDIA_DIR.glob("photo_*.jpg")) + sorted(MEDIA_DIR.glob("pho
 # Supported formats:
 #   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
 #   https://drive.google.com/open?id=FILE_ID
-GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/YOUR_FILE_ID_HERE/view?usp=sharing"
+GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1QD3ng198KXxSXWjBAEt_9ytau2C5-Qb7/view?usp=drive_link"
 
 def gdrive_embed_url(share_url: str) -> str | None:
     """Convert a Google Drive share link to a direct embed URL."""
@@ -35,41 +35,31 @@ def gdrive_embed_url(share_url: str) -> str | None:
     return None
 
 # ── Config (edit these) ───────────────────────────────────────────────────────
-PARTNER_NAMES   = "Name Surname & Name Surname"
-ANNIVERSARY_TEXT = "One Year Of"
-SUBTITLE         = "Endless Love"
-DATE_LINE        = "SUNDAY, 26 APRIL 2026"
-CITY_LINE        = "CITY, STREET, COUNTRY"
-VOL_LINE         = "VOL. 1"
+PARTNER_NAMES   = "Hussein & Abhineet"
+ANNIVERSARY_TEXT = "One Year"
+SUBTITLE         = ""
+DATE_LINE        = "26 APRIL 2025"
+CITY_LINE        = ""
+VOL_LINE         = ""
 
-OUR_STORY_HEADLINE = "OUR DEAREST"
-OUR_STORY_SUBHEAD  = "Journey"
+OUR_STORY_HEADLINE = ""
+OUR_STORY_SUBHEAD  = ""
 OUR_STORY_BODY     = """
-From the very first moment we met, something shifted — quietly, almost without notice, 
-the way morning light changes a room. This year has been filled with shared coffee cups, 
-long walks, unexpected laughter, and the kind of warmth that stays.
 
-Every adventure we have taken together has written itself into who we are.
-The moments big and small, all of it — ours.
 """
 
-LOVE_ALL_HEADLINE  = "LOVE ALL"
-LOVE_ALL_SUBHEAD   = "Around"
+LOVE_ALL_HEADLINE  = "LOVE YOU"
+LOVE_ALL_SUBHEAD   = ""
 LOVE_ALL_BODY      = """
-Love isn't one grand gesture. It lives in the details: a note left on the counter,
-a song played for no reason, a hand found in the dark. 
-We've collected these moments like pressed flowers — fragile, beautiful, kept.
 """
 
-BEST_PART_HEADLINE = "THE BEST PART OF OUR STORY"
+BEST_PART_HEADLINE = ""
 BEST_PART_BODY     = """
-There is no ending here — only the next chapter, and the one after that.
-The best part? We write it together.
 """
 
 ALWAYS_YOURS_TEXT = "ALWAYS YOURS"
 ALWAYS_YOURS_BODY = """
-• Every morning with you\n• Every laugh we've shared\n• Every mile we've walked\n• Every dream we've built\n• Every moment still ahead
+• Every morning with you\n• Every laugh we've shared\n• Every lap we've taken around campus\n• Every moment still ahead
 """
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
