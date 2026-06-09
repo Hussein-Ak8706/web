@@ -7,11 +7,11 @@ from pathlib import Path
 # CONFIG — edit everything here
 # ══════════════════════════════════════════════════════════════════════════════
 
-PARTNER_NAMES    = "Name Surname & Name Surname"
-ANNIVERSARY_TEXT = "One Year Of"
+PARTNER_NAMES    = "Hussein & Abhineet"
+ANNIVERSARY_TEXT = "One Year"
 SUBTITLE         = "Endless Love"
-DATE_LINE        = "SUNDAY, 26 APRIL 2025"
-CITY_LINE        = "CITY, STREET, COUNTRY"
+DATE_LINE        = "SATURDAY, 26 APRIL 2025"
+CITY_LINE        = "Mohali, Plaksha"
 VOL_LINE         = "VOL. 1"
 
 OUR_STORY_HEADLINE = "OUR DEAREST"
@@ -55,11 +55,11 @@ ALWAYS_YOURS_ITEMS = [
 #   INK_LIGHT : body copy, captions, meta text
 #   ACCENT    : placeholder boxes, subtle tints
 #
-PAGE_BG   = "#f5f0e8"
-PAPER_BG  = "#faf6ee"
-INK       = "#1a1a1a"
-INK_LIGHT = "#444444"
-ACCENT    = "#e8e2d8"
+PAGE_BG   = "#1e1520"
+PAPER_BG  = "#261a2e"
+INK       = "#e8d5f5"
+INK_LIGHT = "#c4a8e0"
+ACCENT    = "#3d2b4f"
 
 # ── PHOTOS ────────────────────────────────────────────────────────────────────
 # Option A (default): local files in Base/Media/
