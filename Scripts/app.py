@@ -7,35 +7,35 @@ from pathlib import Path
 # CONFIG — edit everything here
 # ══════════════════════════════════════════════════════════════════════════════
 
-PARTNER_NAMES    = "Name Surname & Name Surname"
-ANNIVERSARY_TEXT = "One Year Of"
-SUBTITLE         = "Endless Love"
-DATE_LINE        = "SUNDAY, 26 APRIL 2025"
-CITY_LINE        = "CITY, STREET, COUNTRY"
+PARTNER_NAMES    = "Hussein & Abhineet"
+ANNIVERSARY_TEXT = "One Year"
+SUBTITLE         = ""
+DATE_LINE        = "SATURDAY, 26 APRIL 2025"
+CITY_LINE        = "Plaksha, Mohali"
 VOL_LINE         = "VOL. 1"
 
 # Two main paragraphs — replace these with your actual story
 PARA_1 = (
-    "From the very first moment we met, something shifted — quietly, almost without notice, "
-    "the way morning light changes a room. This year has been filled with shared coffee cups, "
-    "long walks, unexpected laughter, and the kind of warmth that stays. "
-    "Every adventure we have taken together has written itself into who we are. "
-    "The moments big and small, all of it — ours."
+    "The past year has been super crazy."
+    "The first time I saw you singing riptide I never would've thought we'd end up together and thats such a surreal feeling."
+    "Started to talk cuz we were part of the same band and kept talking cuz of music first then gradually more because **someone** started to catch feelings"
+    "Staying up till 5 am after studying just yapping together and then in the next sem the never ending walks."
+    "I never thought I could enjoy being with someone this much, laughing at every small stupid thing and sharing my autistic memes."
 )
 
 PARA_2 = (
-    "Love isn't one grand gesture. It lives in the details: a note left on the counter, "
-    "a song played for no reason, a hand found in the dark. "
-    "We've collected these moments like pressed flowers — fragile, beautiful, kept. "
-    "There is no ending here — only the next chapter, and the one after that. "
-    "The best part? We write it together."
+    "And it's only gotten better since we got together. Staying together till dawn"
+    "talking all the time and often just enjoying each others company in silence all of it has to be my fav time of the day."
+    "Everytime you've come to me for help and vice-versa, gone to the music room to jamm and sing,"
+    "ordering and sharing food, making silly faces and doing silly trends we found on reels"
+    "all of it has been magical and I'm so happy that i fell in love with you. Happy Anniversary love"
 )
 
 ALWAYS_YOURS_ITEMS = [
-    "Every morning with you",
-    "Every laugh we've shared",
-    "Every mile we've walked",
-    "Every dream we've built",
+    "Every silly moments with you",
+    "Every laugh we've had",
+    "Every lap of the campus we've taken",
+    "All the food we've had",
     "Every moment still ahead",
 ]
 
@@ -53,7 +53,7 @@ ACCENT    = "#ddd0eb"   # soft lavender tint
 PHOTO_URLS = None
 
 # ── VIDEO ─────────────────────────────────────────────────────────────────────
-GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/YOUR_FILE_ID_HERE/view?usp=sharing"
+GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1QD3ng198KXxSXWjBAEt_9ytau2C5-Qb7/view?usp=drive_link"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # INTERNALS
