@@ -38,13 +38,13 @@ ALWAYS_YOURS_ITEMS = [
     "Every moment still ahead",
 ]
 
-GATE_BG          = "#ffb6c1"   # pink background
+GATE_BG          = "#ba99c5"   # pink background
 GATE_CARD_BG     = "#fff0f5"   # card background
 GATE_INK         = "#8b0057"   # dark text / button color
 GATE_INK_LIGHT   = "#c2185b"   # lighter text
 GATE_BUTTON_BG   = "#ff1493"   # hot pink button
 GATE_BUTTON_TEXT = "#ffffff"
-GATE_TITLE       = "For The Man Of My Life 🎀"
+GATE_TITLE       = "For My CPP!!!"
 GATE_SUBTITLE    = "Enter our special date to unlock"
 GATE_PLACEHOLDER = "DD / MM / YYYY"
 GATE_BUTTON_TEXT_LABEL = "Unlock MY Heart"
@@ -494,7 +494,7 @@ if not st.session_state.unlocked:
           </div>
           <div style="font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em;
                       color:{GATE_INK_LIGHT}; margin-top:16px;">
-            Our Anniversary Date
+            (Actual One)
           </div>
         </div>
         """, unsafe_allow_html=True)
