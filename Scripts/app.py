@@ -542,7 +542,7 @@ if not st.session_state.unlocked:
 </div>
 <script>
   var norm = function(v){{ return v.toLowerCase().replace(/[\\s\\-\\/]/g,'').trim(); }};
-  var accepted = {str([a.lower().replace(" ","").replace("-","").replace("/","") for a in ACCEPTED])};
+  var accepted = {accepted_js};
   function check(){{
     var v = norm(document.getElementById('d').value);
     if(accepted.indexOf(v) !== -1){{
