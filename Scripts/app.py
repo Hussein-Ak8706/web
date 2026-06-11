@@ -438,99 +438,80 @@ html = f"""<!DOCTYPE html>
 if "unlocked" not in st.session_state:
     st.session_state.unlocked = False
 
-# Check query param first (set by the gate's JS)
-if st.query_params.get("unlocked") == "1":
-    st.session_state.unlocked = True
-    st.query_params.clear()
-
 if not st.session_state.unlocked:
-    accepted_norm = list({a.lower().replace(" ","").replace("-","").replace("/","") for a in ACCEPTED})
+    st.markdown(f"""
+    <style>
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"] {{ background: {GATE_BG} !important; }}
+    .block-container {{ padding: 0 !important; }}
 
-    gate_html = f"""<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-<style>
-* {{ box-sizing:border-box; margin:0; padding:0; }}
-html, body {{
-    min-height:100vh; width:100%;
-    background:{GATE_BG};
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Playfair Display', Georgia, serif;
-    padding:24px;
-}}
-.card {{
-    background:{GATE_CARD_BG};
-    border:1.5px solid {GATE_INK};
-    border-radius:16px;
-    padding:40px 32px 36px;
-    width:100%; max-width:360px;
-    text-align:center;
-    box-shadow:0 4px 24px rgba(139,0,87,0.10);
-}}
-.hearts {{ font-size:2rem; margin-bottom:12px; }}
-.title {{ font-size:1.45rem; font-weight:900; color:{GATE_INK}; margin-bottom:8px; }}
-.sub {{ font-style:italic; font-size:0.92rem; color:{GATE_INK_LIGHT}; margin-bottom:22px; }}
-.label {{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em; color:{GATE_INK_LIGHT}; margin-bottom:10px; }}
-input {{
-    width:100%; padding:13px 16px;
-    border:1.5px solid {GATE_INK}; border-radius:10px;
-    background:white; font-size:1rem; color:{GATE_INK};
-    text-align:center; letter-spacing:0.08em;
-    outline:none; margin-bottom:14px; font-family:Georgia,serif;
-}}
-input:focus {{ border-color:{GATE_BUTTON_BG}; }}
-button {{
-    width:100%; padding:14px;
-    background:{GATE_BUTTON_BG}; color:{GATE_BUTTON_TEXT};
-    border:none; border-radius:50px;
-    font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
-    cursor:pointer; letter-spacing:0.04em;
-}}
-button:active {{ opacity:0.85; transform:scale(0.98); }}
-.err {{ font-style:italic; font-size:0.82rem; color:#c0392b; min-height:20px; margin-top:10px; }}
-</style>
-</head>
-<body>
-<div class="card">
-  <div class="hearts">🎀 🎀</div>
-  <div class="title">{GATE_TITLE}</div>
-  <div class="sub">{GATE_SUBTITLE}</div>
-  <div class="label">Our Anniversary Date</div>
-  <input id="d" type="text" placeholder="{GATE_PLACEHOLDER}"
-    autocomplete="off" onkeydown="if(event.key==='Enter')check()"/>
-  <button onclick="check()">{GATE_BUTTON_TEXT_LABEL}</button>
-  <div class="err" id="err"></div>
-</div>
-<script>
-  var accepted = {accepted_norm};
-  function norm(v) {{ return v.toLowerCase().replace(/[\\s\\-\\/]/g,'').trim(); }}
-  function check() {{
-    var v = norm(document.getElementById('d').value);
-    if (accepted.indexOf(v) !== -1) {{
-      window.parent.location.href = window.parent.location.href.split('?')[0] + '?unlocked=1';
-    }} else {{
-      document.getElementById('err').textContent = v === '' ? 'Please enter a date 💜' : '{GATE_ERROR_TEXT}';
-      document.getElementById('d').style.borderColor = '#c0392b';
-      setTimeout(function(){{ document.getElementById('d').style.borderColor = '{GATE_INK}'; }}, 1200);
+    div[data-testid="stForm"] {{
+        background: {GATE_CARD_BG};
+        border: 1.5px solid {GATE_INK};
+        border-radius: 16px;
+        padding: 40px 32px 36px;
+        max-width: 360px;
+        margin: 12vh auto 0 auto;
+        text-align: center;
+        box-shadow: 0 4px 24px rgba(139,0,87,0.10);
     }}
-  }}
-</script>
-</body>
-</html>"""
-
-    st.markdown(f"""<style>
-    [data-testid="stAppViewContainer"], [data-testid="stMain"] {{
-        background:{GATE_BG} !important;
-        padding:0 !important;
+    div[data-testid="stTextInput"] input {{
+        text-align: center !important;
+        font-size: 1rem !important;
+        border: 1.5px solid {GATE_INK} !important;
+        border-radius: 10px !important;
+        color: {GATE_INK} !important;
+        background: white !important;
+        letter-spacing: 0.08em !important;
     }}
-    .block-container {{ padding:0 !important; }}
-    iframe {{ display:block; width:100vw; border:none; }}
-    </style>""", unsafe_allow_html=True)
+    div[data-testid="stFormSubmitButton"] button {{
+        background: {GATE_BUTTON_BG} !important;
+        color: {GATE_BUTTON_TEXT} !important;
+        border: none !important;
+        border-radius: 50px !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        width: 100% !important;
+        padding: 14px !important;
+        margin-top: 4px !important;
+    }}
+    div[data-testid="stFormSubmitButton"] button:hover {{ opacity: 0.88 !important; }}
+    div[data-testid="stTextInput"] label {{ display: none !important; }}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    """, unsafe_allow_html=True)
 
-    components.html(gate_html, height=520, scrolling=False)
+    with st.form("gate_form"):
+        st.markdown(f"""
+        <div style="text-align:center; margin-bottom:20px;">
+          <div style="font-size:2rem; margin-bottom:12px;">🎀 🎀</div>
+          <div style="font-size:1.45rem; font-weight:900; color:{GATE_INK};
+                      font-family:'Playfair Display',Georgia,serif; margin-bottom:8px;">
+            {GATE_TITLE}
+          </div>
+          <div style="font-style:italic; font-size:0.92rem; color:{GATE_INK_LIGHT}; margin-bottom:8px;">
+            {GATE_SUBTITLE}
+          </div>
+          <div style="font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em;
+                      color:{GATE_INK_LIGHT}; margin-top:16px;">
+            Our Anniversary Date
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        answer = st.text_input("Date", placeholder=GATE_PLACEHOLDER,
+                               label_visibility="hidden")
+        submitted = st.form_submit_button(GATE_BUTTON_TEXT_LABEL)
+
+        if submitted:
+            norm = answer.lower().replace(" ","").replace("-","").replace("/","").strip()
+            accepted_norm = {a.lower().replace(" ","").replace("-","").replace("/","") for a in ACCEPTED}
+            if norm in accepted_norm:
+                st.session_state.unlocked = True
+                st.rerun()
+            else:
+                st.error(GATE_ERROR_TEXT)
+
     st.stop()
 
 components.html(html, height=3600, scrolling=False)
