@@ -546,7 +546,7 @@ if not st.session_state.unlocked:
   function check(){{
     var v = norm(document.getElementById('d').value);
     if(accepted.indexOf(v) !== -1){{
-      window.location.href = window.location.href.split('?')[0] + '?unlocked=1';
+      window.parent.postMessage('unlocked', '*');
     }} else {{
       document.getElementById('err').textContent = v==='' ? 'Please enter a date 💜' : '{GATE_ERROR_TEXT}';
       document.getElementById('d').style.borderColor='#c0392b';
@@ -568,6 +568,6 @@ if not st.session_state.unlocked:
         st.stop()
 
 # ── shown only after unlock ───────────────────────────────────────────────────
-# components.html(html, height=3600, scrolling=False)
+components.html(html, height=3600, scrolling=False)
 
 components.html(html, height=3600, scrolling=False)
