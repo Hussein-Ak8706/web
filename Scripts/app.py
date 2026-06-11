@@ -120,7 +120,7 @@ def photo_tag(idx):
             f'Photo {idx+1}</div>')
 
 def video_tag():
-    embed = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)
+    embed = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)6640 187 427
     if embed and "YOUR_FILE_ID_HERE" not in GOOGLE_DRIVE_VIDEO_URL:
         return f"""
         <div style="max-width:520px;margin:0 auto;">
@@ -138,39 +138,59 @@ def video_tag():
         Paste your Google Drive link into<br>
         <code style="color:{INK};font-size:0.75rem;">GOOGLE_DRIVE_VIDEO_URL</code> in app.py
       </div>"""
-
+      
 def music_tag():
     if "YOUR_MUSIC_FILE_ID_HERE" in GOOGLE_DRIVE_MUSIC_URL:
-        return ""  # no music configured, render nothing
+        return ""
     direct = gdrive_direct_url(GOOGLE_DRIVE_MUSIC_URL)
-    autoplay_attr = "autoplay" if MUSIC_AUTOPLAY else ""
+    initial_icon = "⏸" if MUSIC_AUTOPLAY else "▶"
+    initial_playing = "true" if MUSIC_AUTOPLAY else "false"
     return f"""
-    <audio id="bg-music" {autoplay_attr} loop
+    <audio id="bg-music" loop preload="auto"
       style="display:none;">
       <source src="{direct}" type="audio/mpeg">
     </audio>
 
-    <!-- Floating music toggle button -->
-    <div id="music-btn" onclick="toggleMusic()" style="
-      position:fixed; bottom:24px; right:24px; z-index:9999;
-      width:44px; height:44px; border-radius:50%;
-      background:{INK}; border:2px solid {ACCENT};
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; box-shadow:0 2px 12px rgba(0,0,0,0.35);
-      transition: transform 0.15s ease;">
-      <span id="music-icon" style="font-size:1.2rem;">{"⏸" if MUSIC_AUTOPLAY else "▶"}</span>
+    <!-- Sticky music toggle button — top right -->
+    <div style="position:sticky;top:16px;z-index:9999;
+                display:flex;justify-content:flex-end;
+                pointer-events:none;margin-bottom:-52px;">
+      <div id="music-btn" onclick="toggleMusic()" style="
+        width:44px; height:44px; border-radius:50%;
+        background:{INK}; border:2px solid {ACCENT};
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; pointer-events:all;
+        box-shadow:0 2px 12px rgba(0,0,0,0.35);
+        transition: transform 0.15s ease;
+        margin-right:16px;">
+        <span id="music-icon" style="font-size:1.2rem;">{initial_icon}</span>
+      </div>
     </div>
 
     <script>
       var audio = document.getElementById('bg-music');
-      var btn   = document.getElementById('music-btn');
       var icon  = document.getElementById('music-icon');
-      var playing = {'true' if MUSIC_AUTOPLAY else 'false'};
+      var btn   = document.getElementById('music-btn');
+      var playing = {initial_playing};
 
-      // Browsers block autoplay until user interacts — resume on first click anywhere
-      document.addEventListener('click', function() {{
+      function startAudio() {{
+        if (playing) {{
+          var p = audio.play();
+          if (p !== undefined) {{
+            p.catch(function() {{
+              icon.textContent = '▶';
+              playing = false;
+            }});
+          }}
+        }}
+      }}
+
+      // Try immediately, then on first user interaction as fallback
+      startAudio();
+      document.addEventListener('click', function onFirstClick() {{
         if (playing && audio.paused) audio.play();
-      }}, {{ once: true }});
+        document.removeEventListener('click', onFirstClick);
+      }});
 
       function toggleMusic() {{
         if (audio.paused) {{
@@ -186,7 +206,7 @@ def music_tag():
         setTimeout(function(){{ btn.style.transform = 'scale(1)'; }}, 120);
       }}
     </script>"""
-
+    
 html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
