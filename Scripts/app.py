@@ -543,31 +543,27 @@ if not st.session_state.unlocked:
 <script>
   var norm = function(v){{ return v.toLowerCase().replace(/[\\s\\-\\/]/g,'').trim(); }};
   var accepted = {accepted_js};
-  function check(){{
-    var v = norm(document.getElementById('d').value);
-    if(accepted.indexOf(v) !== -1){{
-      window.parent.postMessage('unlocked', '*');
-    }} else {{
-      document.getElementById('err').textContent = v==='' ? 'Please enter a date 💜' : '{GATE_ERROR_TEXT}';
-      document.getElementById('d').style.borderColor='#c0392b';
-      setTimeout(function(){{ document.getElementById('d').style.borderColor='{GATE_INK}'; }},1200);
-    }}
-  }}
+  function check(){
+      var v = norm(document.getElementById('d').value);
+      if(accepted.indexOf(v) !== -1){
+        window.parent.document.querySelectorAll('input[type="text"]')[0].value = v;
+        window.parent.document.querySelectorAll('input[type="text"]')[0].dispatchEvent(new Event('input', {bubbles:true}));
+      } else {
+        document.getElementById('err').textContent = v==='' ? 'Please enter a date 💜' : '{GATE_ERROR_TEXT}';
+        document.getElementById('d').style.borderColor='#c0392b';
+        setTimeout(function(){{ document.getElementById('d').style.borderColor='{GATE_INK}'; }},1200);
+      }
+    }
 </script>
 </body>
 </html>"""
 
     # Check if they just submitted via URL param
-    params = st.query_params
-    if params.get("unlocked") == "1":
+    components.html(gate_html, height=600, scrolling=False)
+    answer = st.text_input("", key="gate", label_visibility="collapsed")
+    if answer.lower().replace(" ","").replace("-","").replace("/","").strip() in accepted_js.replace("'","").replace("[","").replace("]","").split(", "):
         st.session_state.unlocked = True
-        st.query_params.clear()
         st.rerun()
-    else:
-        components.html(gate_html, height=600, scrolling=False)
-        st.stop()
-
-# ── shown only after unlock ───────────────────────────────────────────────────
-components.html(html, height=3600, scrolling=False)
+    st.stop()
 
 components.html(html, height=3600, scrolling=False)
