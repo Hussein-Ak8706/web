@@ -64,16 +64,6 @@ MUSIC_AUTOPLAY = True
 # INTERNALS
 # ══════════════════════════════════════════════════════════════════════════════
 
-st.set_page_config(page_title="The Love Gazette", layout="wide",
-                   initial_sidebar_state="collapsed")
-
-st.markdown("""
-<style>
-[data-testid="stHeader"]{display:none;}
-.block-container{padding:0!important;max-width:100%!important;}
-footer{display:none;}
-[data-testid="stAppViewContainer"]{background:#ba99c5;}
-</style>""", unsafe_allow_html=True)
 
 BASE_DIR  = Path(__file__).resolve().parent.parent
 MEDIA_DIR = BASE_DIR / "Media"
@@ -188,231 +178,184 @@ def music_tag():
         setTimeout(function(){{ btn.style.transform = 'scale(1)'; }}, 120);
       }}
     </script>"""
-    
-html = f"""<!DOCTYPE html>
+# ... (keep all your existing CONFIG and function definitions unchanged) ...
+
+# ══════════════════════════════════════════════════════════════════════════════
+# REPLACE everything from st.set_page_config(...) downward with this:
+# ══════════════════════════════════════════════════════════════════════════════
+
+st.set_page_config(page_title="The Love Gazette", layout="wide",
+                   initial_sidebar_state="collapsed")
+
+st.markdown("""
+<style>
+[data-testid="stHeader"]{display:none;}
+.block-container{padding:0!important;max-width:100%!important;}
+footer{display:none;}
+[data-testid="stAppViewContainer"]{background:#ba99c5;}
+</style>""", unsafe_allow_html=True)
+
+# ── GATE ─────────────────────────────────────────────────────────────────────
+CORRECT_DATE = "2025-04-26"   # change if needed; also accepts "26-04-2025" etc.
+ACCEPTED = {"2025-04-26", "26-04-2025", "26/04/2025", "2025/04/26",
+            "26042025", "26 april 2025", "april 26 2025",
+            "26 apr 2025", "apr 26 2025"}
+
+if "unlocked" not in st.session_state:
+    st.session_state.unlocked = False
+
+if not st.session_state.unlocked:
+    gate_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after {{ box-sizing:border-box; margin:0; padding:0; }}
+  * {{ box-sizing:border-box; margin:0; padding:0; }}
   body {{
-    background: {PAGE_BG};
-    font-family: 'Libre Baskerville', Georgia, serif;
-    color: {INK};
-    padding: 28px 16px 60px;
+    min-height:100vh;
+    background:{PAGE_BG};
+    display:flex; align-items:center; justify-content:center;
+    font-family: 'Playfair Display', Georgia, serif;
+    padding:24px;
   }}
-  .page {{
-    max-width: 860px;
-    margin: 0 auto 32px auto;
-    background: {PAPER_BG};
-    border: 1.5px solid {INK};
+  .card {{
+    background:{PAPER_BG};
+    border:1.5px solid {INK};
+    border-radius:4px;
+    padding:40px 32px 36px;
+    max-width:380px;
+    width:100%;
+    text-align:center;
   }}
-  .masthead {{
-    padding: 10px 18px 6px;
-    text-align: center;
-    border-bottom: 2.5px solid {INK};
+  .title {{
+    font-family:'UnifrakturMaguntia', 'Playfair Display', cursive;
+    font-size:2rem;
+    color:{INK};
+    margin-bottom:6px;
   }}
-  .masthead-title {{
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: clamp(1.6rem, 5vw, 3.2rem);
-    line-height: 1;
-    color: {INK};
+  .sub {{
+    font-family:'IM Fell English', serif;
+    font-style:italic;
+    font-size:0.95rem;
+    color:{INK_LIGHT};
+    margin-bottom:28px;
   }}
-  .masthead-meta {{
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.52rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: {INK_LIGHT};
-    padding: 4px 0 2px;
-    border-top: 0.75px solid {INK};
-    border-bottom: 0.75px solid {INK};
-    margin-top: 5px;
+  .label {{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:{INK_LIGHT};
+    margin-bottom:10px;
   }}
-  .hero-block {{
-    text-align: center;
-    padding: 16px 24px 12px;
-    border-bottom: 1.5px solid {INK};
+  input {{
+    width:100%;
+    padding:12px 16px;
+    border:1.5px solid {INK};
+    border-radius:3px;
+    background:white;
+    font-size:1rem;
+    font-family:Georgia, serif;
+    color:{INK};
+    text-align:center;
+    letter-spacing:0.08em;
+    outline:none;
+    margin-bottom:16px;
   }}
-  .hero-kicker {{
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(0.75rem, 2vw, 1.1rem);
-    font-weight: 700;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: {INK_LIGHT};
+  input:focus {{ border-color:{INK_LIGHT}; }}
+  button {{
+    width:100%;
+    padding:13px;
+    background:{INK};
+    color:{PAPER_BG};
+    border:none;
+    border-radius:50px;
+    font-family:'Playfair Display', serif;
+    font-size:1rem;
+    font-weight:700;
+    cursor:pointer;
+    letter-spacing:0.06em;
+    transition:opacity 0.15s;
+    margin-bottom:12px;
   }}
-  .hero-head {{
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 7vw, 4.4rem);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.01em;
-    color: {INK};
+  button:hover {{ opacity:0.85; }}
+  .err {{
+    font-family:'IM Fell English', serif;
+    font-style:italic;
+    font-size:0.82rem;
+    color:#c0392b;
+    min-height:20px;
+    margin-top:4px;
   }}
-  .hero-sub {{
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: clamp(1rem, 2.5vw, 1.45rem);
-    color: {INK_LIGHT};
-    margin-top: 4px;
-  }}
-  .video-slot {{
-    padding: 18px 24px;
-    border-bottom: 2px solid {INK};
-  }}
-  .byline {{
-    text-align: center;
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: clamp(0.9rem, 2vw, 1.2rem);
-    letter-spacing: 0.05em;
-    padding: 10px 0 12px;
-    color: {INK};
-  }}
-  .spread {{
-    display: grid;
-    grid-template-columns: 1fr 1.5px 1fr;
-    border-top: 1px solid {INK};
-  }}
-  .spread-col {{ padding: 16px 18px; }}
-  .spread-divider {{ background: {INK}; }}
-  .story-head {{
-    text-align: center;
-    padding: 14px 24px 10px;
-    border-bottom: 2px solid {INK};
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.6rem, 4.5vw, 2.8rem);
-    font-weight: 900;
-    color: {INK};
-  }}
-  .text-block {{
-    display: grid;
-    grid-template-columns: 1fr 1.5px 1fr;
-    border-bottom: 1px solid {INK};
-  }}
-  .text-col {{ padding: 16px 18px; }}
-  .body-p {{
-    font-size: 0.75rem;
-    line-height: 1.8;
-    color: {INK_LIGHT};
-    text-align: justify;
-    hyphens: auto;
-  }}
-  .always-yours {{
-    border-top: 1px solid {INK};
-    padding: 14px 18px 18px;
-    text-align: center;
-  }}
-  .always-head {{
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    border-bottom: 1px solid {INK};
-    padding-bottom: 6px;
-    margin-bottom: 10px;
-    color: {INK};
-  }}
-  .always-item {{
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: 0.82rem;
-    color: {INK_LIGHT};
-    padding: 4px 0;
-    border-bottom: 0.5px solid {ACCENT};
-  }}
-  .always-item:last-child {{ border-bottom: none; }}
-  .footer {{
-    max-width: 860px;
-    margin: 0 auto;
-    text-align: center;
-    font-size: 0.52rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: {ACCENT};
-    padding: 14px 0;
-    opacity: 0.7;
-  }}
+  .hearts {{ font-size:1.6rem; margin-bottom:14px; }}
 </style>
 </head>
 <body>
-
-{music_tag()}
-
-<!-- PAGE 1 — FRONT COVER -->
-<div class="page">
-  <div class="masthead">
-    <div class="masthead-title">The Love Gazette</div>
-    <div class="masthead-meta">
-      <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
-    </div>
-  </div>
-  <div class="hero-block">
-    <div class="hero-kicker">{ANNIVERSARY_TEXT}</div>
-    <div class="hero-head">{ANNIVERSARY_TEXT.upper()}</div>
-    <div class="hero-sub">{SUBTITLE}</div>
-  </div>
-  <div class="video-slot">{video_tag()}</div>
-  <div class="byline">{PARTNER_NAMES}</div>
+<div class="card">
+  <div class="hearts">🎀 💜 🎀</div>
+  <div class="title">The Love Gazette</div>
+  <div class="sub">Enter our special date to unlock</div>
+  <div class="label">Our Anniversary Date</div>
+  <input id="dateinput" type="text" placeholder="DD / MM / YYYY"
+    autocomplete="off" onkeydown="if(event.key==='Enter') check()" />
+  <button onclick="check()">Unlock My Heart 💜</button>
+  <div class="err" id="err"></div>
 </div>
 
+<script>
+  var accepted = {list(ACCEPTED)};
 
-<!-- PAGE 2 — PHOTOS + STORY -->
-<div class="page">
-  <div class="masthead">
-    <div class="masthead-title" style="font-size:clamp(1.2rem,3.5vw,2rem);">The Love Gazette</div>
-    <div class="masthead-meta">
-      <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-bottom:1.5px solid {INK};">
-    <div style="overflow:hidden;height:300px;"><img src="{photo_src(0)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
-    <div style="background:{INK};"></div>
-    <div style="overflow:hidden;height:300px;"><img src="{photo_src(1)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
-  </div>
-  <div class="text-block">
-    <div class="text-col"><p class="body-p">{PARA_1}</p></div>
-    <div style="background:{INK};"></div>
-    <div class="text-col"><p class="body-p">{PARA_2}</p></div>
-  </div>
-  <div class="byline">{PARTNER_NAMES}</div>
-</div>
+  function normalise(v) {{
+    return v.toLowerCase().replace(/[\\s\\-\\/]/g,'').trim();
+  }}
 
+  var normAccepted = accepted.map(function(a){{
+    return normalise(a);
+  }});
 
-<!-- PAGE 3 — THE STORY OF US -->
-<div class="page">
-  <div class="masthead">
-    <div class="masthead-title" style="font-size:clamp(1.2rem,3.5vw,2rem);">The Love Gazette</div>
-    <div class="masthead-meta">
-      <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
-    </div>
-  </div>
-  <div class="story-head">The Story of Us</div>
-  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-bottom:1.5px solid {INK};">
-    <div style="overflow:hidden;height:320px;"><img src="{photo_src(2)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
-    <div style="background:{INK};"></div>
-    <div style="overflow:hidden;height:320px;"><img src="{photo_src(3)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1.5px 1fr 1.5px 1fr;border-top:1.5px solid {INK};">
-    <div style="overflow:hidden;height:280px;"><img src="{photo_src(4)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
-    <div style="background:{INK};"></div>
-    <div style="overflow:hidden;height:280px;"><img src="{photo_src(5)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
-    <div style="background:{INK};"></div>
-    <div class="always-yours" style="border-top:none;">
-      <div class="always-head">Always Yours</div>
-      {"".join(f'<div class="always-item">&#8226;&nbsp; {item}</div>' for item in ALWAYS_YOURS_ITEMS)}
-    </div>
-  </div>
-</div>
-
-<div class="footer">The Love Gazette &nbsp;·&nbsp; Printed with Love</div>
+  function check() {{
+    var val = document.getElementById('dateinput').value;
+    var norm = normalise(val);
+    // also accept just "2604" or "26april" shortcuts
+    var extra = ["2604", "26april", "april26", "26apr", "apr26"];
+    if (normAccepted.indexOf(norm) !== -1 || extra.indexOf(norm) !== -1) {{
+      // send correct answer back to Streamlit via query param trick
+      window.parent.postMessage({{type:'streamlit:setComponentValue', value:'UNLOCKED'}}, '*');
+    }} else {{
+      document.getElementById('err').textContent =
+        norm === '' ? 'Please enter a date ♡' : 'Hmm, that\\'s not quite right... try again 💜';
+      document.getElementById('dateinput').style.borderColor = '#c0392b';
+      setTimeout(function(){{
+        document.getElementById('dateinput').style.borderColor = '{INK}';
+      }}, 1200);
+    }}
+  }}
+</script>
 </body>
 </html>"""
 
+    result = components.html(gate_html, height=500)
+    # Streamlit component bridge — check for unlock signal
+    # Since postMessage to parent doesn't work across Streamlit's iframe boundary,
+    # we use a text input hidden below as the actual unlock mechanism:
+    st.markdown(
+        f'<style>[data-testid="stTextInput"]{{visibility:hidden;height:0;padding:0;margin:0;}}</style>',
+        unsafe_allow_html=True
+    )
+    answer = st.text_input("date", key="gate_input", label_visibility="hidden",
+                           placeholder="Enter the date above")
+    if answer:
+        norm = answer.lower().replace(" ", "").replace("-", "").replace("/", "").strip()
+        extras = {"2604", "26april", "april26", "26apr", "apr26"}
+        norm_accepted = {a.lower().replace(" ", "").replace("-", "").replace("/", "")
+                         for a in ACCEPTED}
+        if norm in norm_accepted or norm in extras:
+            st.session_state.unlocked = True
+            st.rerun()
+        else:
+            st.error("That's not quite right 💜 try again!")
+    st.stop()
+
+# ── MAIN CONTENT (only shown after unlock) ────────────────────────────────────
 components.html(html, height=3600, scrolling=False)
