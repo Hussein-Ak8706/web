@@ -441,6 +441,7 @@ if "unlocked" not in st.session_state:
     st.session_state.unlocked = False
 
 if not st.session_state.unlocked:
+    accepted_js = str([a.lower().replace(" ","").replace("-","").replace("/","") for a in ACCEPTED])
     gate_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
