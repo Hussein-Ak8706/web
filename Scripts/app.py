@@ -142,63 +142,45 @@ def video_tag():
 def music_tag():
     if "YOUR_MUSIC_FILE_ID_HERE" in GOOGLE_DRIVE_MUSIC_URL:
         return ""
-    direct = gdrive_direct_url(GOOGLE_DRIVE_MUSIC_URL)
-    initial_icon = "⏸" if MUSIC_AUTOPLAY else "▶"
-    initial_playing = "true" if MUSIC_AUTOPLAY else "false"
+    embed = gdrive_embed_url(GOOGLE_DRIVE_MUSIC_URL)
     return f"""
-    <audio id="bg-music" loop preload="auto"
-      style="display:none;">
-      <source src="{direct}" type="audio/mpeg">
-    </audio>
+    <!-- Hidden Drive audio iframe -->
+    <iframe id="audio-frame"
+      src=""
+      style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
+      allow="autoplay">
+    </iframe>
 
-    <!-- Sticky music toggle button — top right -->
+    <!-- Sticky top-right button -->
     <div style="position:sticky;top:16px;z-index:9999;
                 display:flex;justify-content:flex-end;
                 pointer-events:none;margin-bottom:-52px;">
       <div id="music-btn" onclick="toggleMusic()" style="
-        width:44px; height:44px; border-radius:50%;
-        background:{INK}; border:2px solid {ACCENT};
-        display:flex; align-items:center; justify-content:center;
-        cursor:pointer; pointer-events:all;
+        width:44px;height:44px;border-radius:50%;
+        background:{INK};border:2px solid {ACCENT};
+        display:flex;align-items:center;justify-content:center;
+        cursor:pointer;pointer-events:all;
         box-shadow:0 2px 12px rgba(0,0,0,0.35);
-        transition: transform 0.15s ease;
+        transition:transform 0.15s ease;
         margin-right:16px;">
-        <span id="music-icon" style="font-size:1.2rem;">{initial_icon}</span>
+        <span id="music-icon" style="font-size:1.2rem;">▶</span>
       </div>
     </div>
 
     <script>
-      var audio = document.getElementById('bg-music');
-      var icon  = document.getElementById('music-icon');
-      var btn   = document.getElementById('music-btn');
-      var playing = {initial_playing};
-
-      function startAudio() {{
-        if (playing) {{
-          var p = audio.play();
-          if (p !== undefined) {{
-            p.catch(function() {{
-              icon.textContent = '▶';
-              playing = false;
-            }});
-          }}
-        }}
-      }}
-
-      // Try immediately, then on first user interaction as fallback
-      startAudio();
-      document.addEventListener('click', function onFirstClick() {{
-        if (playing && audio.paused) audio.play();
-        document.removeEventListener('click', onFirstClick);
-      }});
+      var frame   = document.getElementById('audio-frame');
+      var icon    = document.getElementById('music-icon');
+      var btn     = document.getElementById('music-btn');
+      var playing = false;
+      var src     = "{embed}";
 
       function toggleMusic() {{
-        if (audio.paused) {{
-          audio.play();
+        if (!playing) {{
+          frame.src = src;
           icon.textContent = '⏸';
           playing = true;
         }} else {{
-          audio.pause();
+          frame.src = '';
           icon.textContent = '▶';
           playing = false;
         }}
