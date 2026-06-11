@@ -57,7 +57,7 @@ GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1QD3ng198KXxSXWjBAEt_9
 # 3. Paste the share link below
 # Set MUSIC_AUTOPLAY = True to start playing automatically on page load
 # Set MUSIC_AUTOPLAY = False to show a play button instead
-GOOGLE_DRIVE_MUSIC_URL = "https://drive.google.com/file/d/1Z1Vy9yQAmH9veAG_JJy9Fx3M5IAg-prf/view?usp=sharing"
+GOOGLE_DRIVE_MUSIC_URL = "https://drive.google.com/file/d/1GfcTF6OGsSIB0rqMCI7tBtN10AnPqS3h/view?usp=sharing"
 MUSIC_AUTOPLAY = True
 
 # ══════════════════════════════════════════════════════════════════════════════
