@@ -14,46 +14,51 @@ DATE_LINE        = "SATURDAY, 26 APRIL 2025"
 CITY_LINE        = "Plaksha, Mohali"
 VOL_LINE         = "VOL. 1"
 
-# Two main paragraphs — replace these with your actual story
 PARA_1 = (
-    "The past year has been super crazy."
-    "The first time I saw you singing riptide I never would've thought we'd end up together and thats such a surreal feeling."
-    "Started to talk cuz we were part of the same band and kept talking cuz of music first then gradually more because **someone** started to catch feelings"
-    "Staying up till 5 am after studying just yapping together and then in the next sem the never ending walks."
+    "The past year has been super crazy. "
+    "The first time I saw you singing riptide I never would've thought we'd end up together and thats such a surreal feeling. "
+    "Started to talk cuz we were part of the same band and kept talking cuz of music first then gradually more because someone started to catch feelings. "
+    "Staying up till 5 am after studying just yapping together and then in the next sem the never ending walks. "
     "I never thought I could enjoy being with someone this much, laughing at every small stupid thing and sharing my autistic memes."
 )
 
 PARA_2 = (
-    "And it's only gotten better since we got together. Staying together till dawn"
-    "talking all the time and often just enjoying each others company in silence all of it has to be my fav time of the day."
-    "Everytime you've come to me for help and vice-versa, gone to the music room to jamm and sing,"
-    "ordering and sharing food, making silly faces and doing silly trends we found on reels"
-    "all of it has been magical and I'm so happy that i fell in love with you. Happy Anniversary love"
+    "And it's only gotten better since we got together. Staying together till dawn, "
+    "talking all the time and often just enjoying each others company in silence — all of it has to be my fav time of the day. "
+    "Everytime you've come to me for help and vice-versa, gone to the music room to jamm and sing, "
+    "ordering and sharing food, making silly faces and doing silly trends we found on reels — "
+    "all of it has been magical and I'm so happy that I fell in love with you. Happy Anniversary love."
 )
 
 ALWAYS_YOURS_ITEMS = [
-    "Every silly moments with you",
+    "Every silly moment with you",
     "Every laugh we've had",
     "Every lap of the campus we've taken",
-    "All the food we've had",
+    "All the food we've shared",
     "Every moment still ahead",
 ]
 
 # ── COLORS ───────────────────────────────────────────────────────────────────
-PAGE_BG   = "#ba99c5"   # deep purple backdrop
-PAPER_BG  = "#f7f2fa"   # light plum-tinted paper
-INK       = "#3b1f4e"   # dark plum ink
-INK_LIGHT = "#6b4a82"   # medium purple for body text
-ACCENT    = "#ddd0eb"   # soft lavender tint
+PAGE_BG   = "#ba99c5"
+PAPER_BG  = "#f7f2fa"
+INK       = "#3b1f4e"
+INK_LIGHT = "#6b4a82"
+ACCENT    = "#ddd0eb"
 
-# ── PHOTOS ────────────────────────────────────────────────────────────────────
-# Option A (default): put photo_01.jpg … photo_04.jpg in Base/Media/
-# Option B: paste 4 Google Drive URLs here:
-#   PHOTO_URLS = ["https://drive.google.com/uc?export=view&id=ID1", ...]
+# ── PHOTOS ───────────────────────────────────────────────────────────────────
 PHOTO_URLS = None
 
 # ── VIDEO ─────────────────────────────────────────────────────────────────────
 GOOGLE_DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1QD3ng198KXxSXWjBAEt_9ytau2C5-Qb7/view?usp=drive_link"
+
+# ── MUSIC ─────────────────────────────────────────────────────────────────────
+# 1. Upload an mp3 to Google Drive
+# 2. Share it as "Anyone with the link can view"
+# 3. Paste the share link below
+# Set MUSIC_AUTOPLAY = True to start playing automatically on page load
+# Set MUSIC_AUTOPLAY = False to show a play button instead
+GOOGLE_DRIVE_MUSIC_URL = "https://drive.google.com/file/d/1Z1Vy9yQAmH9veAG_JJy9Fx3M5IAg-prf/view?usp=sharing"
+MUSIC_AUTOPLAY = True
 
 # ══════════════════════════════════════════════════════════════════════════════
 # INTERNALS
@@ -67,7 +72,7 @@ st.markdown("""
 [data-testid="stHeader"]{display:none;}
 .block-container{padding:0!important;max-width:100%!important;}
 footer{display:none;}
-[data-testid="stAppViewContainer"]{background:#2d1f3d;}
+[data-testid="stAppViewContainer"]{background:#ba99c5;}
 </style>""", unsafe_allow_html=True)
 
 BASE_DIR  = Path(__file__).resolve().parent.parent
@@ -79,6 +84,13 @@ def _local_photos():
         sorted(MEDIA_DIR.glob("photo_*.png")),
         key=lambda p: p.name
     )
+
+def gdrive_direct_url(url):
+    """Convert any Drive share link to a direct streamable URL."""
+    m = re.search(r"/d/([a-zA-Z0-9_-]+)", url)
+    if not m:
+        m = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url)
+    return f"https://drive.google.com/uc?export=open&id={m.group(1)}" if m else None
 
 def gdrive_embed_url(url):
     m = re.search(r"/d/([a-zA-Z0-9_-]+)", url)
@@ -126,6 +138,54 @@ def video_tag():
         Paste your Google Drive link into<br>
         <code style="color:{INK};font-size:0.75rem;">GOOGLE_DRIVE_VIDEO_URL</code> in app.py
       </div>"""
+
+def music_tag():
+    if "YOUR_MUSIC_FILE_ID_HERE" in GOOGLE_DRIVE_MUSIC_URL:
+        return ""  # no music configured, render nothing
+    direct = gdrive_direct_url(GOOGLE_DRIVE_MUSIC_URL)
+    autoplay_attr = "autoplay" if MUSIC_AUTOPLAY else ""
+    return f"""
+    <audio id="bg-music" {autoplay_attr} loop
+      style="display:none;">
+      <source src="{direct}" type="audio/mpeg">
+    </audio>
+
+    <!-- Floating music toggle button -->
+    <div id="music-btn" onclick="toggleMusic()" style="
+      position:fixed; bottom:24px; right:24px; z-index:9999;
+      width:44px; height:44px; border-radius:50%;
+      background:{INK}; border:2px solid {ACCENT};
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; box-shadow:0 2px 12px rgba(0,0,0,0.35);
+      transition: transform 0.15s ease;">
+      <span id="music-icon" style="font-size:1.2rem;">{"⏸" if MUSIC_AUTOPLAY else "▶"}</span>
+    </div>
+
+    <script>
+      var audio = document.getElementById('bg-music');
+      var btn   = document.getElementById('music-btn');
+      var icon  = document.getElementById('music-icon');
+      var playing = {'true' if MUSIC_AUTOPLAY else 'false'};
+
+      // Browsers block autoplay until user interacts — resume on first click anywhere
+      document.addEventListener('click', function() {{
+        if (playing && audio.paused) audio.play();
+      }}, {{ once: true }});
+
+      function toggleMusic() {{
+        if (audio.paused) {{
+          audio.play();
+          icon.textContent = '⏸';
+          playing = true;
+        }} else {{
+          audio.pause();
+          icon.textContent = '▶';
+          playing = false;
+        }}
+        btn.style.transform = 'scale(0.9)';
+        setTimeout(function(){{ btn.style.transform = 'scale(1)'; }}, 120);
+      }}
+    </script>"""
 
 html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -212,8 +272,6 @@ html = f"""<!DOCTYPE html>
     padding: 10px 0 12px;
     color: {INK};
   }}
-
-  /* ── 2-col spread ── */
   .spread {{
     display: grid;
     grid-template-columns: 1fr 1.5px 1fr;
@@ -221,8 +279,6 @@ html = f"""<!DOCTYPE html>
   }}
   .spread-col {{ padding: 16px 18px; }}
   .spread-divider {{ background: {INK}; }}
-
-  /* ── story page: photo row + text below ── */
   .story-head {{
     text-align: center;
     padding: 14px 24px 10px;
@@ -231,19 +287,6 @@ html = f"""<!DOCTYPE html>
     font-size: clamp(1.6rem, 4.5vw, 2.8rem);
     font-weight: 900;
     color: {INK};
-  }}
-  .photo-row {{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    border-bottom: 1.5px solid {INK};
-  }}
-  .photo-row img, .photo-row div {{
-    display: block;
-    width: 100%;
-  }}
-  .photo-row > *:first-child {{
-    border-right: 0.75px solid {INK};
   }}
   .text-block {{
     display: grid;
@@ -258,8 +301,6 @@ html = f"""<!DOCTYPE html>
     text-align: justify;
     hyphens: auto;
   }}
-
-  /* ── Always Yours ── */
   .always-yours {{
     border-top: 1px solid {INK};
     padding: 14px 18px 18px;
@@ -285,7 +326,6 @@ html = f"""<!DOCTYPE html>
     border-bottom: 0.5px solid {ACCENT};
   }}
   .always-item:last-child {{ border-bottom: none; }}
-
   .footer {{
     max-width: 860px;
     margin: 0 auto;
@@ -300,6 +340,8 @@ html = f"""<!DOCTYPE html>
 </style>
 </head>
 <body>
+
+{music_tag()}
 
 <!-- PAGE 1 — FRONT COVER -->
 <div class="page">
@@ -327,25 +369,16 @@ html = f"""<!DOCTYPE html>
       <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
     </div>
   </div>
-
-  <!-- top: two photos at fixed equal height -->
   <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-bottom:1.5px solid {INK};">
     <div style="overflow:hidden;height:300px;"><img src="{photo_src(0)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
     <div style="background:{INK};"></div>
     <div style="overflow:hidden;height:300px;"><img src="{photo_src(1)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
   </div>
-
-  <!-- bottom: two text columns -->
   <div class="text-block">
-    <div class="text-col">
-      <p class="body-p">{PARA_1}</p>
-    </div>
+    <div class="text-col"><p class="body-p">{PARA_1}</p></div>
     <div style="background:{INK};"></div>
-    <div class="text-col">
-      <p class="body-p">{PARA_2}</p>
-    </div>
+    <div class="text-col"><p class="body-p">{PARA_2}</p></div>
   </div>
-
   <div class="byline">{PARTNER_NAMES}</div>
 </div>
 
@@ -358,17 +391,12 @@ html = f"""<!DOCTYPE html>
       <span>{VOL_LINE}</span><span>{DATE_LINE}</span><span>{CITY_LINE}</span>
     </div>
   </div>
-
   <div class="story-head">The Story of Us</div>
-
-  <!-- top: two photos at fixed equal height -->
   <div style="display:grid;grid-template-columns:1fr 1.5px 1fr;border-bottom:1.5px solid {INK};">
     <div style="overflow:hidden;height:320px;"><img src="{photo_src(2)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
     <div style="background:{INK};"></div>
     <div style="overflow:hidden;height:320px;"><img src="{photo_src(3)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
   </div>
-
-  <!-- three photos in equal columns -->
   <div style="display:grid;grid-template-columns:1fr 1.5px 1fr 1.5px 1fr;border-top:1.5px solid {INK};">
     <div style="overflow:hidden;height:280px;"><img src="{photo_src(4)}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" /></div>
     <div style="background:{INK};"></div>
