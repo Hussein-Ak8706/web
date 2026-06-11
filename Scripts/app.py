@@ -438,6 +438,11 @@ html = f"""<!DOCTYPE html>
 if "unlocked" not in st.session_state:
     st.session_state.unlocked = False
 
+# Check query param first (set by the gate's JS)
+if st.query_params.get("unlocked") == "1":
+    st.session_state.unlocked = True
+    st.query_params.clear()
+
 if not st.session_state.unlocked:
     accepted_norm = list({a.lower().replace(" ","").replace("-","").replace("/","") for a in ACCEPTED})
 
@@ -446,34 +451,35 @@ if not st.session_state.unlocked:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
 * {{ box-sizing:border-box; margin:0; padding:0; }}
 html, body {{
-    height:100%; width:100%;
+    min-height:100vh; width:100%;
     background:{GATE_BG};
     display:flex; align-items:center; justify-content:center;
     font-family:'Playfair Display', Georgia, serif;
+    padding:24px;
 }}
 .card {{
     background:{GATE_CARD_BG};
     border:1.5px solid {GATE_INK};
     border-radius:16px;
     padding:40px 32px 36px;
-    width:340px;
+    width:100%; max-width:360px;
     text-align:center;
     box-shadow:0 4px 24px rgba(139,0,87,0.10);
 }}
 .hearts {{ font-size:2rem; margin-bottom:12px; }}
-.title {{ font-size:1.5rem; font-weight:900; color:{GATE_INK}; margin-bottom:8px; }}
-.sub {{ font-style:italic; font-size:0.95rem; color:{GATE_INK_LIGHT}; margin-bottom:20px; }}
-.label {{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:{GATE_INK_LIGHT}; margin-bottom:10px; }}
+.title {{ font-size:1.45rem; font-weight:900; color:{GATE_INK}; margin-bottom:8px; }}
+.sub {{ font-style:italic; font-size:0.92rem; color:{GATE_INK_LIGHT}; margin-bottom:22px; }}
+.label {{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em; color:{GATE_INK_LIGHT}; margin-bottom:10px; }}
 input {{
     width:100%; padding:13px 16px;
     border:1.5px solid {GATE_INK}; border-radius:10px;
-    background:white; font-size:1rem; font-family:Georgia,serif;
-    color:{GATE_INK}; text-align:center; letter-spacing:0.08em;
-    outline:none; margin-bottom:14px;
+    background:white; font-size:1rem; color:{GATE_INK};
+    text-align:center; letter-spacing:0.08em;
+    outline:none; margin-bottom:14px; font-family:Georgia,serif;
 }}
 input:focus {{ border-color:{GATE_BUTTON_BG}; }}
 button {{
@@ -481,10 +487,10 @@ button {{
     background:{GATE_BUTTON_BG}; color:{GATE_BUTTON_TEXT};
     border:none; border-radius:50px;
     font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
-    cursor:pointer; margin-bottom:12px;
+    cursor:pointer; letter-spacing:0.04em;
 }}
-button:hover {{ opacity:0.88; }}
-.err {{ font-style:italic; font-size:0.82rem; color:#c0392b; min-height:20px; margin-top:4px; }}
+button:active {{ opacity:0.85; transform:scale(0.98); }}
+.err {{ font-style:italic; font-size:0.82rem; color:#c0392b; min-height:20px; margin-top:10px; }}
 </style>
 </head>
 <body>
@@ -504,42 +510,27 @@ button:hover {{ opacity:0.88; }}
   function check() {{
     var v = norm(document.getElementById('d').value);
     if (accepted.indexOf(v) !== -1) {{
-      window.parent.postMessage({{isStreamlitMessage: true, type: 'streamlit:setComponentValue', value: v}}, '*');
+      window.parent.location.href = window.parent.location.href.split('?')[0] + '?unlocked=1';
     }} else {{
-      var msg = v === '' ? 'Please enter a date 💜' : "{GATE_ERROR_TEXT}";
-      document.getElementById('err').textContent = msg;
+      document.getElementById('err').textContent = v === '' ? 'Please enter a date 💜' : '{GATE_ERROR_TEXT}';
       document.getElementById('d').style.borderColor = '#c0392b';
-      setTimeout(function() {{ document.getElementById('d').style.borderColor = '{GATE_INK}'; }}, 1200);
+      setTimeout(function(){{ document.getElementById('d').style.borderColor = '{GATE_INK}'; }}, 1200);
     }}
   }}
 </script>
 </body>
 </html>"""
 
-    result = components.html(gate_html, height=500, scrolling=False)
-
-    # Hide the component value receiver visually
-    st.markdown("<style>iframe + div {display:none;}</style>", unsafe_allow_html=True)
-
-    # Use a separate form as fallback — user types here if postMessage fails
-    st.markdown(f"""
-    <style>
+    st.markdown(f"""<style>
     [data-testid="stAppViewContainer"], [data-testid="stMain"] {{
-        background: {GATE_BG} !important;
+        background:{GATE_BG} !important;
+        padding:0 !important;
     }}
+    .block-container {{ padding:0 !important; }}
+    iframe {{ display:block; width:100vw; border:none; }}
     </style>""", unsafe_allow_html=True)
 
-    with st.form("fallback"):
-        answer = st.text_input("Type the date here if the button above didn't work:",
-                               placeholder=GATE_PLACEHOLDER)
-        if st.form_submit_button("Unlock"):
-            norm_ans = answer.lower().replace(" ","").replace("-","").replace("/","").strip()
-            if norm_ans in set(accepted_norm):
-                st.session_state.unlocked = True
-                st.rerun()
-            else:
-                st.error(GATE_ERROR_TEXT)
-
+    components.html(gate_html, height=520, scrolling=False)
     st.stop()
 
 components.html(html, height=3600, scrolling=False)
