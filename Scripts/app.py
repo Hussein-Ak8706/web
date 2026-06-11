@@ -120,7 +120,7 @@ def photo_tag(idx):
             f'Photo {idx+1}</div>')
 
 def video_tag():
-    embed = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)6640 187 427
+    embed = gdrive_embed_url(GOOGLE_DRIVE_VIDEO_URL)
     if embed and "YOUR_FILE_ID_HERE" not in GOOGLE_DRIVE_VIDEO_URL:
         return f"""
         <div style="max-width:520px;margin:0 auto;">
